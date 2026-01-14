@@ -112,17 +112,9 @@ def main():
     new_header = ["Category", "Atomic Elements", "JSON Format", "Description", "Current/ Long-Term", "DB", "Sources", "Permissions", "Notes"]
     manager.append_row(sheet_name, new_header)
 
-    # Write All Elements with Batching/Sleep
-    # Processing in chunks of 5 to avoid Rate Limit
-    chunk_size = 5
-    for i in range(0, len(elements), chunk_size):
-        chunk = elements[i:i + chunk_size]
-        for el in chunk:
-            manager.append_row(sheet_name, el)
-            print(f"Added: {el[1]}") # Element Name is at index 1 now
-        
-        print("Sleeping to avoid rate limit...")
-        time.sleep(2) # 2s sleep every 5 rows
+    # Write All Elements in ONE Batch
+    print(f"Bulk appending {len(elements)} rows...")
+    manager.append_rows(sheet_name, elements)
 
 if __name__ == "__main__":
     main()
