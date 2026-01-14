@@ -1,0 +1,113 @@
+import gspread
+from rich.table import Table
+from rich.console import Console
+from typing import List, Optional
+
+console = Console()
+
+class SheetManager:
+    def __init__(self, gc: gspread.Client):
+        self.gc = gc
+
+    def list_files(self):
+        """Lists all spreadsheets available to the user."""
+        files = self.gc.list_spreadsheet_files()
+        table = Table(title="Google Sheets")
+        table.add_column("ID", style="dim", no_wrap=True)
+        table.add_column("Name", style="bold")
+        
+        for file in files:
+            table.add_row(file['id'], file['name'])
+        
+        console.print(table)
+        return files
+
+    def get_sheet(self, name_or_url: str):
+        """Opens a spreadsheet by name, URL, or ID."""
+        try:
+            if "docs.google.com" in name_or_url:
+                return self.gc.open_by_url(name_or_url)
+            try:
+                return self.gc.open(name_or_url)
+            except gspread.exceptions.SpreadsheetNotFound:
+                # Try opening by key (ID)
+                return self.gc.open_by_key(name_or_url)
+        except gspread.exceptions.SpreadsheetNotFound:
+            console.print(f"[red]Spreadsheet '{name_or_url}' not found.[/red]")
+            return None
+
+    def read_data(self, sheet_name: str, worksheet_name: str = "Sheet1"):
+        """Reads all records from a worksheet."""
+        sh = self.get_sheet(sheet_name)
+        if not sh: return None
+
+        try:
+            ws = sh.worksheet(worksheet_name)
+            # Use get_all_values to avoid duplicate header errors
+            data = ws.get_all_values()
+            
+            # Print first 5 rows as a table for preview
+            if data:
+                headers = data[0]
+                table = Table(title=f"Data Preview: {sheet_name}")
+                for h in headers[:5]: # distinct col limit for display
+                    table.add_column(str(h) if h else "Col", style="bold")
+                
+                for row in data[1:6]:
+                    table.add_row(*[str(c) for c in row[:5]])
+                console.print(table)
+
+            return data
+        except gspread.exceptions.WorksheetNotFound:
+            console.print(f"[red]Worksheet '{worksheet_name}' not found in '{sheet_name}'.[/red]")
+            return None
+
+    def create_sheet(self, title: str):
+        """Creates a new spreadsheet."""
+        sh = self.gc.create(title)
+        console.print(f"[green]Created new sheet: {sh.title} ({sh.url})[/green]")
+        return sh
+
+    def update_cell(self, sheet_name: str, cell_address: str, value: str, worksheet_name: str = "Sheet1"):
+        """Updates a single cell in a worksheet."""
+        sh = self.get_sheet(sheet_name)
+        if not sh: return None
+        try:
+            ws = sh.worksheet(worksheet_name)
+            ws.update_acell(cell_address, value)
+            console.print(f"[green]Updated {cell_address} in {sheet_name} to '{value}'[/green]")
+        except Exception as e:
+            console.print(f"[red]Error updating cell: {e}[/red]")
+
+    def append_row(self, sheet_name: str, values: List[str], worksheet_name: str = "Sheet1"):
+        """Appends a row of values to a worksheet."""
+        sh = self.get_sheet(sheet_name)
+        if not sh: return None
+        try:
+            ws = sh.worksheet(worksheet_name)
+            ws.append_row(values)
+            console.print(f"[green]Appended row to {sheet_name}: {values}[/green]")
+        except Exception as e:
+            console.print(f"[red]Error appending row: {e}[/red]")
+            
+    def clear_range(self, sheet_name: str, range_name: str, worksheet_name: str = "Sheet1"):
+        """Clears a specific range of cells."""
+        sh = self.get_sheet(sheet_name)
+        if not sh: return None
+        try:
+            ws = sh.worksheet(worksheet_name)
+            ws.batch_clear([range_name])
+            console.print(f"[green]Cleared range {range_name} in {sheet_name}[/green]")
+        except Exception as e:
+            console.print(f"[red]Error clearing range: {e}[/red]")
+
+    def delete_row(self, sheet_name: str, row_index: int, worksheet_name: str = "Sheet1"):
+        """Deletes a specific row."""
+        sh = self.get_sheet(sheet_name)
+        if not sh: return None
+        try:
+            ws = sh.worksheet(worksheet_name)
+            ws.delete_rows(row_index)
+            console.print(f"[green]Deleted row {row_index} in {sheet_name}[/green]")
+        except Exception as e:
+            console.print(f"[red]Error deleting row: {e}[/red]")
