@@ -112,6 +112,33 @@ def main():
     new_header = ["Category", "Atomic Elements", "JSON Format", "Description", "Current/ Long-Term", "DB", "Sources", "Permissions", "Notes"]
     manager.append_row(sheet_name, new_header)
 
+    # 6. STRATEGIC INTELLIGENCE (Founders, Experts, Non-obvious)
+    cat = "Strategic Intelligence"
+    elements.extend([
+        [cat, "Founder Activity", "{ handle: str, recent_topic: str }", "Recent posts by competitor founders.", "Current", "Yes", "LinkedIn / X (Twitter)", "Scraping", "Track thought leaderhsip"],
+        [cat, "Expert Consensus", "{ topic: str, sentiment: float }", "Aggregated view from industry experts.", "Current", "Yes", "Substack / Medium / X", "Scraping", "Identify contrarian views"],
+        [cat, "Industry Talk", "{ title: str, summary: str }", "Key learnings from recent TED/Conf talks.", "Long-term", "Yes", "TED / YouTube", "Scraping", "Transcript analysis"],
+        [cat, "Tech Stack Signal", "{ tool: str, action: 'added'|'removed' }", "Competitor tech adoption (e.g. added Shopify).", "Current", "Yes", "BuiltWith / StackShare", "Scraping", "Signal of maturity/strategy"],
+        [cat, "Hiring Velocity", "{ role: str, count: int }", "Competitor hiring surge in specific depts.", "Current", "Yes", "LinkedIn Jobs / Glassdoor", "Scraping", "Signal of expansion"],
+        [cat, "Patent Filing", "{ title: str, date: str }", "New IP registrations.", "Long-term", "Yes", "Google Patents", "Public", "R&D signal"],
+        [cat, "Ad Creative Fatigue", "{ days_active: int }", "How long competitor ads run before swap.", "Current", "Yes", "Meta Ad Library", "Scraping", "Signal of ad performance"],
+        [cat, "Community Sentiment", "{ topic: str, emotion: str }", "Deep dive into Reddit/Discord niche communities.", "Current", "Yes", "Reddit / Discord", "Scraping", "Unfiltered customer voice"],
+    ])
+
+    # Locate rows
+    data = manager.read_data(sheet_name)
+    if not data:
+        print("No data found")
+        return
+
+    print("Clearing sheet for mass population...")
+    manager.clear_range(sheet_name, "A1:Z1000") # Brute force clear
+    time.sleep(1) # Cooldown
+
+    # Write Headers
+    new_header = ["Category", "Atomic Elements", "JSON Format", "Description", "Current/ Long-Term", "DB", "Sources", "Permissions", "Notes"]
+    manager.append_row(sheet_name, new_header)
+
     # Write All Elements in ONE Batch
     print(f"Bulk appending {len(elements)} rows...")
     manager.append_rows(sheet_name, elements)
