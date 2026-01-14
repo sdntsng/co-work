@@ -79,16 +79,27 @@ class SheetManager:
         except Exception as e:
             console.print(f"[red]Error updating cell: {e}[/red]")
 
-    def append_row(self, sheet_name: str, values: List[str], worksheet_name: str = "Sheet1"):
-        """Appends a row of values to a worksheet."""
+    def append_row(self, sheet_name: str, row_data: list, worksheet_name: str = "Sheet1"):
+        """Appends a single row to the worksheet."""
         sh = self.get_sheet(sheet_name)
         if not sh: return None
         try:
             ws = sh.worksheet(worksheet_name)
-            ws.append_row(values)
-            console.print(f"[green]Appended row to {sheet_name}: {values}[/green]")
+            ws.append_row(row_data)
+            console.print(f"[green]Appended row to {sheet_name}: {row_data!r}[/green]")
         except Exception as e:
             console.print(f"[red]Error appending row: {e}[/red]")
+
+    def append_rows(self, sheet_name: str, rows_data: list, worksheet_name: str = "Sheet1"):
+        """Appends multiple rows to the worksheet in one batch."""
+        sh = self.get_sheet(sheet_name)
+        if not sh: return None
+        try:
+            ws = sh.worksheet(worksheet_name)
+            ws.append_rows(rows_data)
+            console.print(f"[green]Appended {len(rows_data)} rows to {sheet_name}[/green]")
+        except Exception as e:
+            console.print(f"[red]Error appending rows: {e}[/red]")
             
     def clear_range(self, sheet_name: str, range_name: str, worksheet_name: str = "Sheet1"):
         """Clears a specific range of cells."""
