@@ -34,7 +34,7 @@ export default function PipelinePage() {
             if (updatedPipeline[oldStage]) {
                 updatedPipeline[oldStage] = {
                     ...updatedPipeline[oldStage],
-                    opportunities: updatedPipeline[oldStage].opportunities.filter(o => o.opp_id !== opp.opp_id),
+                    opportunities: updatedPipeline[oldStage].opportunities.filter((o: Opportunity) => o.opp_id !== opp.opp_id),
                     count: updatedPipeline[oldStage].count - 1,
                     total_value: updatedPipeline[oldStage].total_value - opp.value,
                 };
@@ -110,7 +110,7 @@ export default function PipelinePage() {
             {/* Pipeline Board */}
             <div className="flex-1 overflow-x-auto">
                 <div className="flex gap-4 h-full pb-4" style={{ minWidth: 'max-content' }}>
-                    {data.stages.map(stageName => {
+                    {data.stages.map((stageName: string) => {
                         const stage = data.pipeline[stageName];
                         if (!stage) return null;
 

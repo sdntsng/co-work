@@ -100,7 +100,7 @@ export default function DashboardPage() {
             <div className="glass-card p-6 mb-8">
                 <h2 className="text-lg font-semibold mb-4">Pipeline by Stage</h2>
                 <div className="space-y-3">
-                    {Object.entries(data.pipeline_by_stage).map(([stage, stageData]) => {
+                    {Object.entries(data.pipeline_by_stage).map(([stage, stageData]: [string, { count: number; total_value: number; expected_value: number }]) => {
                         const percentage = data.total_pipeline_value > 0
                             ? (stageData.total_value / data.total_pipeline_value) * 100
                             : 0;
@@ -132,7 +132,7 @@ export default function DashboardPage() {
             <div className="glass-card p-6">
                 <h2 className="text-lg font-semibold mb-4">Leads by Status</h2>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    {Object.entries(data.leads_by_status).map(([status, count]) => (
+                    {Object.entries(data.leads_by_status).map(([status, count]: [string, number]) => (
                         <div key={status} className="text-center p-4 bg-zinc-800/50 rounded-lg">
                             <p className="text-2xl font-bold text-zinc-100">{count}</p>
                             <p className="text-sm text-zinc-500">{status}</p>

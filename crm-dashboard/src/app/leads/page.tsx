@@ -78,7 +78,7 @@ export default function LeadsPage() {
                     onChange={(e) => setStatusFilter(e.target.value)}
                 >
                     <option value="">All Statuses</option>
-                    {config?.lead_statuses.map(status => (
+                    {config?.lead_statuses.map((status: string) => (
                         <option key={status} value={status}>{status}</option>
                     ))}
                 </select>
@@ -245,7 +245,7 @@ function AddLeadModal({
                             value={formData.source}
                             onChange={(e) => setFormData({ ...formData, source: e.target.value })}
                         >
-                            {config?.lead_sources.map(source => (
+                            {config?.lead_sources.map((source: string) => (
                                 <option key={source} value={source}>{source}</option>
                             ))}
                         </select>
