@@ -118,57 +118,61 @@ class CRMTemplates:
 
     def _setup_summary_sheet(self, ws: gspread.Worksheet):
         """Set up the Summary/Dashboard worksheet with aggregate formulas."""
-        # Header
-        ws.update("A1", "Sales Pipeline 2026 - Dashboard")
-        ws.format("A1", {"textFormat": {"bold": True, "fontSize": 16}})
+        try:
+            # Header
+            ws.update_acell("A1", "Sales Pipeline 2026 - Dashboard")
+            ws.format("A1", {"textFormat": {"bold": True, "fontSize": 16}})
 
-        # Key Metrics
-        ws.update("A3", "Key Metrics")
-        ws.format("A3", {"textFormat": {"bold": True, "fontSize": 12}})
+            # Key Metrics
+            ws.update_acell("A3", "Key Metrics")
+            ws.format("A3", {"textFormat": {"bold": True, "fontSize": 12}})
 
-        metrics = [
-            ("Total Leads", '=COUNTA(Leads!A:A)-1'),
-            ("Total Opportunities", '=COUNTA(Opportunities!A:A)-1'),
-            ("Pipeline Value", '=SUMIF(Opportunities!D:D,"<>Closed Lost",Opportunities!E:E)'),
-            ("Closed Won Value", '=SUMIF(Opportunities!D:D,"Closed Won",Opportunities!E:E)'),
-            ("Cash in Bank", '=SUMIF(Opportunities!D:D,"Cash in Bank",Opportunities!E:E)'),
-        ]
+            metrics = [
+                ("Total Leads", '=COUNTA(Leads!A:A)-1'),
+                ("Total Opportunities", '=COUNTA(Opportunities!A:A)-1'),
+                ("Pipeline Value", '=SUMIF(Opportunities!D:D,"<>Closed Lost",Opportunities!E:E)'),
+                ("Closed Won Value", '=SUMIF(Opportunities!D:D,"Closed Won",Opportunities!E:E)'),
+                ("Cash in Bank", '=SUMIF(Opportunities!D:D,"Cash in Bank",Opportunities!E:E)'),
+            ]
 
-        row = 4
-        for label, formula in metrics:
-            ws.update(f"A{row}", label)
-            ws.update(f"B{row}", formula)
-            row += 1
+            row = 4
+            for label, formula in metrics:
+                ws.update_acell(f"A{row}", label)
+                ws.update_acell(f"B{row}", formula)
+                row += 1
 
-        # Format value cells
-        ws.format("B6:B8", {"numberFormat": {"type": "CURRENCY", "pattern": "$#,##0"}})
+            # Format value cells
+            ws.format("B6:B8", {"numberFormat": {"type": "CURRENCY", "pattern": "$#,##0"}})
 
-        # Pipeline by Stage
-        ws.update("A10", "Pipeline by Stage")
-        ws.format("A10", {"textFormat": {"bold": True, "fontSize": 12}})
+            # Pipeline by Stage
+            ws.update_acell("A10", "Pipeline by Stage")
+            ws.format("A10", {"textFormat": {"bold": True, "fontSize": 12}})
 
-        ws.update("A11", "Stage")
-        ws.update("B11", "Count")
-        ws.update("C11", "Value")
-        ws.format("A11:C11", {"textFormat": {"bold": True}})
+            ws.update_acell("A11", "Stage")
+            ws.update_acell("B11", "Count")
+            ws.update_acell("C11", "Value")
+            ws.format("A11:C11", {"textFormat": {"bold": True}})
 
-        row = 12
-        for stage in PipelineStage:
-            ws.update(f"A{row}", stage.value)
-            ws.update(f"B{row}", f'=COUNTIF(Opportunities!D:D,"{stage.value}")')
-            ws.update(f"C{row}", f'=SUMIF(Opportunities!D:D,"{stage.value}",Opportunities!E:E)')
-            row += 1
+            row = 12
+            for stage in PipelineStage:
+                ws.update_acell(f"A{row}", stage.value)
+                ws.update_acell(f"B{row}", f'=COUNTIF(Opportunities!D:D,"{stage.value}")')
+                ws.update_acell(f"C{row}", f'=SUMIF(Opportunities!D:D,"{stage.value}",Opportunities!E:E)')
+                row += 1
 
-        ws.format(f"C12:C{row-1}", {"numberFormat": {"type": "CURRENCY", "pattern": "$#,##0"}})
+            ws.format(f"C12:C{row-1}", {"numberFormat": {"type": "CURRENCY", "pattern": "$#,##0"}})
 
-        # Leads by Status
-        ws.update("A22", "Leads by Status")
-        ws.format("A22", {"textFormat": {"bold": True, "fontSize": 12}})
+            # Leads by Status
+            ws.update_acell("A22", "Leads by Status")
+            ws.format("A22", {"textFormat": {"bold": True, "fontSize": 12}})
 
-        row = 23
-        for status in LeadStatus:
-            ws.update(f"A{row}", status.value)
-            ws.update(f"B{row}", f'=COUNTIF(Leads!F:F,"{status.value}")')
+            row = 23
+            for status in LeadStatus:
+                ws.update_acell(f"A{row}", status.value)
+                ws.update_acell(f"B{row}", f'=COUNTIF(Leads!F:F,"{status.value}")')
+                row += 1
+        except Exception as e:
+            console.print(f"[yellow]Warning: Could not fully set up Summary sheet: {e}[/yellow]")
             row += 1
 
     def _add_dropdown_validation(self, ws: gspread.Worksheet, range_str: str, values: list):
