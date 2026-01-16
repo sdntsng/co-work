@@ -119,6 +119,7 @@ export default function PipelinePage() {
                                 <PipelineColumn
                                     stage={stage}
                                     onDrop={handleDrop}
+                                    onUpdate={fetchPipeline}
                                 />
                             </div>
                         );

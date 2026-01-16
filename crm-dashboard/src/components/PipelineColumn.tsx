@@ -8,21 +8,22 @@ interface PipelineColumnProps {
     stage: PipelineStage;
     onDrop: (opp: Opportunity, newStage: string) => void;
     onOppClick?: (opp: Opportunity) => void;
+    onUpdate?: () => void;
 }
 
 const stageColors: Record<string, string> = {
     'Prospecting': 'from-indigo-500/20',
     'Discovery': 'from-violet-500/20',
-    'Proposal': 'from-purple-500/20',
-    'Negotiation': 'from-yellow-500/20',
-    'Closed Won': 'from-green-500/20',
+    'Proposal': 'from-fuchsia-500/20',
+    'Negotiation': 'from-amber-500/20',
+    'Closed Won': 'from-emerald-500/20',
     'Closed Lost': 'from-red-500/20',
-    'Delivery': 'from-cyan-500/20',
+    'Delivery': 'from-sky-500/20',
     'Invoicing': 'from-orange-500/20',
-    'Cash in Bank': 'from-emerald-500/20',
+    'Cash in Bank': 'from-teal-500/20',
 };
 
-export default function PipelineColumn({ stage, onDrop, onOppClick }: PipelineColumnProps) {
+export default function PipelineColumn({ stage, onDrop, onOppClick, onUpdate }: PipelineColumnProps) {
     const [isDragOver, setIsDragOver] = useState(false);
     const [draggedOpp, setDraggedOpp] = useState<Opportunity | null>(null);
 
@@ -97,6 +98,7 @@ export default function PipelineColumn({ stage, onDrop, onOppClick }: PipelineCo
                         opportunity={opp}
                         onDragStart={handleDragStart}
                         onClick={onOppClick}
+                        onUpdate={onUpdate}
                     />
                 ))}
 
