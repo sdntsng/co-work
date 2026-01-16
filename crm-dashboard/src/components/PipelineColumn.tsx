@@ -11,17 +11,8 @@ interface PipelineColumnProps {
     onUpdate?: () => void;
 }
 
-const stageColors: Record<string, string> = {
-    'Prospecting': 'from-indigo-500/20',
-    'Discovery': 'from-violet-500/20',
-    'Proposal': 'from-fuchsia-500/20',
-    'Negotiation': 'from-amber-500/20',
-    'Closed Won': 'from-emerald-500/20',
-    'Closed Lost': 'from-red-500/20',
-    'Delivery': 'from-sky-500/20',
-    'Invoicing': 'from-orange-500/20',
-    'Cash in Bank': 'from-teal-500/20',
-};
+// Single accent style - no per-stage colors
+const defaultColor = 'from-zinc-500/10';
 
 export default function PipelineColumn({ stage, onDrop, onOppClick, onUpdate }: PipelineColumnProps) {
     const [isDragOver, setIsDragOver] = useState(false);
@@ -67,7 +58,7 @@ export default function PipelineColumn({ stage, onDrop, onOppClick, onUpdate }: 
         }).format(value);
     };
 
-    const colorClass = stageColors[stage.stage] || 'from-zinc-500/20';
+    const colorClass = defaultColor;
 
     return (
         <div
