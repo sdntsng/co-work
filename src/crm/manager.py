@@ -28,6 +28,30 @@ class CRMManager:
     def __init__(self, sheet_manager: SheetManager, sheet_name: str = SHEET_NAME):
         self.sm = sheet_manager
         self.sheet_name = sheet_name
+        
+        # Caching
+        self._cache: Dict[str, List[Any]] = {}
+        self._last_fetch: Dict[str, datetime] = {}
+        self.CACHE_TTL = 30  # seconds
+
+    def _get_cached_data(self, worksheet: str) -> Optional[List[List[str]]]:
+        """Get cached data if valid."""
+        now = datetime.now()
+        if worksheet in self._last_fetch:
+            age = (now - self._last_fetch[worksheet]).total_seconds()
+            if age < self.CACHE_TTL:
+                return self._cache.get(worksheet)
+        return None
+
+    def _set_cached_data(self, worksheet: str, data: List[List[str]]):
+        """Update cache."""
+        self._cache[worksheet] = data
+        self._last_fetch[worksheet] = datetime.now()
+
+    def _invalidate_cache(self, worksheet: str):
+        """Invalidate cache for a worksheet."""
+        if worksheet in self._last_fetch:
+            del self._last_fetch[worksheet]
 
     # -------------------------------------------------------------------------
     # Lead Operations
@@ -38,11 +62,17 @@ class CRMManager:
         lead.created_at = datetime.now()
         lead.updated_at = datetime.now()
         self.sm.append_row(self.sheet_name, lead.to_row(), LEADS_WS)
+        self._invalidate_cache(LEADS_WS)
         return lead
 
     def get_leads(self) -> List[Lead]:
         """Retrieve all leads."""
-        data = self.sm.read_data(self.sheet_name, LEADS_WS)
+        data = self._get_cached_data(LEADS_WS)
+        if data is None:
+            data = self.sm.read_data(self.sheet_name, LEADS_WS)
+            if data:
+                self._set_cached_data(LEADS_WS, data)
+        
         if not data or len(data) < 2:
             return []
         # Skip header row
@@ -60,12 +90,11 @@ class CRMManager:
             if existing.lead_id == lead.lead_id:
                 lead.updated_at = datetime.now()
                 # Row index is i + 2 (1-indexed + header row)
+                # Row index is i + 2 (1-indexed + header row)
                 row_index = i + 2
-                row_data = lead.to_row()
-                # Update each cell in the row
-                for col_idx, value in enumerate(row_data):
-                    cell = f"{chr(65 + col_idx)}{row_index}"
-                    self.sm.update_cell(self.sheet_name, cell, str(value), LEADS_WS)
+                # Use batch update_row instead of cell-by-cell
+                self.sm.update_row(self.sheet_name, row_index, lead.to_row(), LEADS_WS)
+                self._invalidate_cache(LEADS_WS)
                 return True
         return False
 
@@ -76,6 +105,7 @@ class CRMManager:
             if lead.lead_id == lead_id:
                 row_index = i + 2  # 1-indexed + header
                 self.sm.delete_row(self.sheet_name, row_index, LEADS_WS)
+                self._invalidate_cache(LEADS_WS)
                 return True
         return False
 
@@ -88,11 +118,17 @@ class CRMManager:
         opp.created_at = datetime.now()
         opp.updated_at = datetime.now()
         self.sm.append_row(self.sheet_name, opp.to_row(), OPPS_WS)
+        self._invalidate_cache(OPPS_WS)
         return opp
 
     def get_opportunities(self) -> List[Opportunity]:
         """Retrieve all opportunities."""
-        data = self.sm.read_data(self.sheet_name, OPPS_WS)
+        data = self._get_cached_data(OPPS_WS)
+        if data is None:
+            data = self.sm.read_data(self.sheet_name, OPPS_WS)
+            if data:
+                self._set_cached_data(OPPS_WS, data)
+        
         if not data or len(data) < 2:
             return []
         return [Opportunity.from_row(row) for row in data[1:] if row[0]]
@@ -113,10 +149,9 @@ class CRMManager:
             if existing.opp_id == opp.opp_id:
                 opp.updated_at = datetime.now()
                 row_index = i + 2
-                row_data = opp.to_row()
-                for col_idx, value in enumerate(row_data):
-                    cell = f"{chr(65 + col_idx)}{row_index}"
-                    self.sm.update_cell(self.sheet_name, cell, str(value), OPPS_WS)
+                # Use batch update_row
+                self.sm.update_row(self.sheet_name, row_index, opp.to_row(), OPPS_WS)
+                self._invalidate_cache(OPPS_WS)
                 return True
         return False
 
@@ -138,6 +173,7 @@ class CRMManager:
             if opp.opp_id == opp_id:
                 row_index = i + 2
                 self.sm.delete_row(self.sheet_name, row_index, OPPS_WS)
+                self._invalidate_cache(OPPS_WS)
                 return True
         return False
 
@@ -149,11 +185,16 @@ class CRMManager:
         """Log a new activity."""
         activity.date = datetime.now()
         self.sm.append_row(self.sheet_name, activity.to_row(), ACTIVITIES_WS)
+        self._invalidate_cache(ACTIVITIES_WS)
         return activity
 
     def get_activities(self, lead_id: Optional[str] = None, opp_id: Optional[str] = None) -> List[Activity]:
         """Get activities, optionally filtered by lead or opportunity."""
-        data = self.sm.read_data(self.sheet_name, ACTIVITIES_WS)
+        data = self._get_cached_data(ACTIVITIES_WS)
+        if data is None:
+            data = self.sm.read_data(self.sheet_name, ACTIVITIES_WS)
+            if data:
+                self._set_cached_data(ACTIVITIES_WS, data)
         if not data or len(data) < 2:
             return []
         activities = [Activity.from_row(row) for row in data[1:] if row[0]]

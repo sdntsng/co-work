@@ -8,6 +8,7 @@ console = Console()
 class SheetManager:
     def __init__(self, gc: gspread.Client):
         self.gc = gc
+        self._sh_cache = {}  # Cache for opened Spreadsheet objects
 
     def list_files(self):
         """Lists all spreadsheets available to the user."""
@@ -23,15 +24,25 @@ class SheetManager:
         return files
 
     def get_sheet(self, name_or_url: str):
-        """Opens a spreadsheet by name, URL, or ID."""
+        """Opens a spreadsheet by name, URL, or ID (cached)."""
+        if name_or_url in self._sh_cache:
+            return self._sh_cache[name_or_url]
+
         try:
+            sh = None
             if "docs.google.com" in name_or_url:
-                return self.gc.open_by_url(name_or_url)
-            try:
-                return self.gc.open(name_or_url)
-            except gspread.exceptions.SpreadsheetNotFound:
-                # Try opening by key (ID)
-                return self.gc.open_by_key(name_or_url)
+                sh = self.gc.open_by_url(name_or_url)
+            else:
+                try:
+                    sh = self.gc.open(name_or_url)
+                except gspread.exceptions.SpreadsheetNotFound:
+                    # Try opening by key (ID)
+                    sh = self.gc.open_by_key(name_or_url)
+            
+            if sh:
+                self._sh_cache[name_or_url] = sh
+            return sh
+
         except gspread.exceptions.SpreadsheetNotFound:
             console.print(f"[red]Spreadsheet '{name_or_url}' not found.[/red]")
             return None
@@ -78,6 +89,26 @@ class SheetManager:
             console.print(f"[green]Updated {cell_address} in {sheet_name} to '{value}'[/green]")
         except Exception as e:
             console.print(f"[red]Error updating cell: {e}[/red]")
+
+    def update_row(self, sheet_name: str, row_index: int, row_data: list, worksheet_name: str = "Sheet1"):
+        """Updates an entire row efficiently."""
+        sh = self.get_sheet(sheet_name)
+        if not sh: return None
+        try:
+            ws = sh.worksheet(worksheet_name)
+            # Calculate range, e.g., A2:Z2
+            start_cell = f"A{row_index}"
+            end_col = chr(65 + len(row_data) - 1) # simple logic for < 26 cols
+            if len(row_data) > 26: append_col = "Z" # Fallback/TODO for >26 cols
+            
+            # gspread update usage: update([cell_list] or range_name, values=[[]])
+            # For a single row, values is [[col1, col2, ...]]
+            # Range identifier: "A2" works for starting point? range "A2:Z2" is safer
+            range_name = f"A{row_index}"
+            ws.update(check_input_data=False, range_name=range_name, values=[row_data])
+            console.print(f"[green]Updated row {row_index} in {sheet_name} (Batch)[/green]")
+        except Exception as e:
+            console.print(f"[red]Error updating row: {e}[/red]")
 
     def append_row(self, sheet_name: str, row_data: list, worksheet_name: str = "Sheet1"):
         """Appends a single row to the worksheet."""
