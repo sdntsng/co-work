@@ -3,11 +3,13 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getPipeline, updateOpportunityStage, PipelineData, Opportunity } from '@/lib/api';
 import PipelineColumn from '@/components/PipelineColumn';
+import AddOpportunityModal from '@/components/modals/AddOpportunityModal';
 
 export default function PipelinePage() {
     const [data, setData] = useState<PipelineData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [showAddModal, setShowAddModal] = useState(false);
 
     const fetchPipeline = useCallback(async () => {
         try {
@@ -102,7 +104,10 @@ export default function PipelinePage() {
                     <h1 className="text-2xl font-bold text-zinc-100">Pipeline</h1>
                     <p className="text-zinc-500">Drag opportunities between stages</p>
                 </div>
-                <button className="btn-primary">
+                <button
+                    className="btn-primary"
+                    onClick={() => setShowAddModal(true)}
+                >
                     + Add Opportunity
                 </button>
             </div>
@@ -126,6 +131,14 @@ export default function PipelinePage() {
                     })}
                 </div>
             </div>
+            {showAddModal && (
+                <AddOpportunityModal
+                    onClose={() => setShowAddModal(false)}
+                    onSuccess={() => {
+                        fetchPipeline();
+                    }}
+                />
+            )}
         </div>
     );
 }

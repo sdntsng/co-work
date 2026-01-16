@@ -1,33 +1,72 @@
 @import "tailwindcss";
 
 :root {
-  /* Modern Dark theme colors */
-  --background: #030712;
-  /* Richer black (near gray-950) */
-  --foreground: #f8fafc;
-  --card: #111827;
-  /* Gray-900 */
-  --card-hover: #1f2937;
-  /* Gray-800 */
+  /* Dark (Default) - "Midnight Editorial" */
+  --bg-primary: #030712;
+  /* Zinc 950 */
+  --bg-secondary: #111827;
+  /* Zinc 900 */
+  --text-primary: #f8fafc;
+  /* Zinc 50 */
+  --text-secondary: #94a3b8;
+  /* Zinc 400 */
   --border: #1e293b;
-  /* Slate-800 */
+  /* Zinc 800 */
+  --card-bg: rgba(17, 24, 39, 0.7);
+  --card-hover: #1f2937;
+  --glass-border: rgba(255, 255, 255, 0.08);
+
   --accent: #6366f1;
-  /* Indigo-500 */
+  /* Indigo 500 */
   --accent-light: #818cf8;
+  --accent-text: #e0e7ff;
+
   --success: #10b981;
   --warning: #f59e0b;
   --danger: #ef4444;
-  --muted: #64748b;
+
+  --font-serif: var(--font-playfair), serif;
+  --font-sans: var(--font-inter), sans-serif;
+}
+
+[data-theme='light'] {
+  /* Light - "Modern Editorial Paper" */
+  --bg-primary: #fafaf9;
+  /* Stone 50 */
+  --bg-secondary: #f5f5f4;
+  /* Stone 100 */
+  --text-primary: #1c1917;
+  /* Stone 900 */
+  --text-secondary: #57534e;
+  /* Stone 600 */
+  --border: #e7e5e4;
+  /* Stone 200 */
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --card-hover: #ffffff;
+  --glass-border: rgba(0, 0, 0, 0.06);
+
+  --accent: #4f46e5;
+  /* Indigo 600 - slightly darker for contrast */
+  --accent-light: #6366f1;
+  --accent-text: #ffffff;
 }
 
 body {
-  background:
-    radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.08), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 25%),
-    var(--background);
-  color: var(--foreground);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Typography Overrides */
+h1,
+h2,
+h3,
+h4,
+.font-serif {
+  font-family: var(--font-serif);
+  letter-spacing: -0.02em;
 }
 
 /* Scrollbar */
@@ -46,173 +85,155 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--muted);
+  background: var(--text-secondary);
 }
 
-/* Glassmorphism card */
+/* Glassmorphism */
 .glass-card {
-  background: rgba(17, 24, 39, 0.7);
+  background: var(--card-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s ease;
 }
 
-/* Pipeline column */
+/* Pipeline styles */
 .pipeline-column {
-  background: rgba(17, 24, 39, 0.4);
+  background: var(--bg-secondary);
   border: 1px dashed var(--border);
   border-radius: 16px;
   min-height: 500px;
-  transition: background 0.2s ease;
+  transition: all 0.3s ease;
+}
+
+[data-theme='light'] .pipeline-column {
+  background: rgba(0, 0, 0, 0.02);
+  border-style: solid;
 }
 
 .pipeline-column:hover {
-  background: rgba(17, 24, 39, 0.6);
-  border-color: rgba(99, 102, 241, 0.3);
+  border-color: var(--accent);
 }
 
-/* Opportunity card */
 .opp-card {
-  background: rgba(30, 41, 59, 0.7);
-  /* Slightly lighter than bg */
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
   padding: 16px;
   cursor: grab;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.opp-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.03), transparent);
-  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .opp-card:hover {
-  background: rgba(30, 41, 59, 1);
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
-  border-color: rgba(99, 102, 241, 0.4);
-}
-
-.opp-card:active {
-  cursor: grabbing;
-  transform: scale(0.98);
-}
-
-/* Dashboard stat card */
-.stat-card {
-  background: rgba(17, 24, 39, 0.7);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  padding: 24px;
-  transition: transform 0.2s ease;
-}
-
-.stat-card:hover {
   transform: translateY(-2px);
-}
-
-.stat-card.success .text-3xl {
-  color: #34d399;
-}
-
-.stat-card.warning .text-3xl {
-  color: #fbbf24;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border-color: var(--accent);
 }
 
 /* Button styles */
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-light));
-  color: white;
+  background: var(--accent);
+  color: var(--accent-text);
   padding: 10px 24px;
-  border-radius: 10px;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  border-radius: 8px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  letter-spacing: 0.01em;
   transition: all 0.2s ease;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .btn-primary:hover {
-  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.5);
+  opacity: 0.9;
   transform: translateY(-1px);
-}
-
-.btn-primary:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 
 /* Input styles */
 .input {
-  background: rgba(17, 24, 39, 0.8);
+  background: var(--bg-secondary);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 8px;
   padding: 12px 16px;
-  color: var(--foreground);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
   transition: all 0.2s ease;
 }
 
 .input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-  background: rgba(17, 24, 39, 1);
+  background: var(--bg-primary);
+  box-shadow: 0 0 0 2px var(--accent-light);
+  /* Opacity needed? CSS var doesn't allow alpha easily unless mapped */
 }
 
-/* Stage colors */
+/* Utility / Text Colors */
+.text-zinc-100 {
+  color: var(--text-primary) !important;
+}
+
+.text-zinc-200 {
+  color: var(--text-primary) !important;
+}
+
+.text-zinc-400 {
+  color: var(--text-secondary) !important;
+}
+
+.text-zinc-500 {
+  color: var(--text-secondary) !important;
+}
+
+.text-zinc-600 {
+  color: var(--text-secondary) !important;
+}
+
+/* Stage Border Colors */
 .stage-prospecting {
-  border-left-color: #6366f1;
+  border-left: 4px solid #6366f1;
 }
 
 .stage-discovery {
-  border-left-color: #8b5cf6;
+  border-left: 4px solid #8b5cf6;
 }
 
 .stage-proposal {
-  border-left-color: #d946ef;
+  border-left: 4px solid #d946ef;
 }
 
 .stage-negotiation {
-  border-left-color: #f59e0b;
+  border-left: 4px solid #f59e0b;
 }
 
 .stage-closed-won {
-  border-left-color: #10b981;
+  border-left: 4px solid #10b981;
 }
 
 .stage-closed-lost {
-  border-left-color: #ef4444;
+  border-left: 4px solid #ef4444;
 }
 
 .stage-delivery {
-  border-left-color: #0ea5e9;
+  border-left: 4px solid #0ea5e9;
 }
 
 .stage-invoicing {
-  border-left-color: #f97316;
+  border-left: 4px solid #f97316;
 }
 
 .stage-cash-in-bank {
-  border-left-color: #14b8a6;
+  border-left: 4px solid #14b8a6;
 }
 
-/* Animations */
+/* Animation */
 @keyframes fade-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
 
   to {
@@ -222,5 +243,27 @@ body {
 }
 
 .animate-fade-in {
-  animation: fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+/* Sidebar Specific */
+.sidebar {
+  background: var(--bg-primary);
+  border-right: 1px solid var(--border);
+}
+
+.sidebar-link {
+  color: var(--text-secondary);
+}
+
+.sidebar-link:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.sidebar-link.active {
+  background: var(--bg-secondary);
+  /* or a Tint */
+  color: var(--accent);
+  border: 1px solid var(--border);
 }

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import ThemeToggle from './ThemeToggle';
 
 const navItems = [
     { href: '/', label: 'Dashboard', icon: '📊' },
@@ -13,12 +14,13 @@ export default function Sidebar() {
     const pathname = usePathname();
 
     return (
-        <aside className="w-64 min-h-screen bg-zinc-950 border-r border-zinc-800 flex flex-col">
+        <aside className="w-64 min-h-screen sidebar flex flex-col transition-colors duration-300">
             {/* Logo */}
-            <div className="p-6 border-b border-zinc-800">
-                <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                    Sales Pipeline 2026
+            <div className="p-6 border-b border-[var(--border)] flex justify-between items-center">
+                <h1 className="text-xl font-serif font-bold text-[var(--accent)] tracking-tight">
+                    Vinci CRM
                 </h1>
+                <ThemeToggle />
             </div>
 
             {/* Navigation */}
@@ -28,9 +30,9 @@ export default function Sidebar() {
                         <li key={item.href}>
                             <Link
                                 href={item.href}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${pathname === item.href
-                                        ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/30'
-                                        : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100'
+                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all sidebar-link ${pathname === item.href
+                                    ? 'active font-medium shadow-sm'
+                                    : ''
                                     }`}
                             >
                                 <span>{item.icon}</span>
@@ -42,7 +44,7 @@ export default function Sidebar() {
             </nav>
 
             {/* Footer */}
-            <div className="p-4 border-t border-zinc-800">
+            <div className="p-4 border-t border-[var(--border)]">
                 <p className="text-xs text-zinc-600 text-center">
                     Powered by Google Sheets
                 </p>

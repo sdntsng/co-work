@@ -56,6 +56,19 @@ export interface DashboardData {
   leads_by_status: Record<string, number>;
 }
 
+// Enum for stages matches backend
+export enum PipelineStageEnum {
+  PROSPECTING = "Prospecting",
+  DISCOVERY = "Discovery",
+  PROPOSAL = "Proposal",
+  NEGOTIATION = "Negotiation",
+  CLOSED_WON = "Closed Won",
+  CLOSED_LOST = "Closed Lost",
+  DELIVERY = "Delivery",
+  INVOICING = "Invoicing",
+  CASH_IN_BANK = "Cash in Bank",
+}
+
 export interface PipelineStage {
   stage: string;
   opportunities: Opportunity[];
