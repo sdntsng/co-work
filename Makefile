@@ -1,8 +1,12 @@
 
-.PHONY: setup login run lint crm-init crm-api crm-dashboard crm-dev
+.PHONY: setup login run lint crm-init crm-api crm-dashboard crm-dev kill-ports
 
 PYTHON = ./venv/bin/python
 MODULE = src.main
+
+# Unique ports for CRM (using 2026 suffix to avoid conflicts)
+API_PORT = 8026
+DASHBOARD_PORT = 3026
 
 # =============================================================================
 # Setup & Auth
@@ -57,23 +61,29 @@ crm-pipeline:
 # CRM Servers (run these in separate terminals)
 # =============================================================================
 
-crm-api:
-	@echo "Starting CRM API server on http://localhost:8001..."
-	./venv/bin/uvicorn api.server:app --reload --port 8001
+kill-ports:
+	@echo "Killing processes on ports $(API_PORT) and $(DASHBOARD_PORT)..."
+	@lsof -ti:$(API_PORT) | xargs kill -9 2>/dev/null || true
+	@lsof -ti:$(DASHBOARD_PORT) | xargs kill -9 2>/dev/null || true
+	@echo "Ports released."
+
+crm-api: kill-ports
+	@echo "Starting CRM API server on http://localhost:$(API_PORT)..."
+	./venv/bin/uvicorn api.server:app --reload --port $(API_PORT)
 
 crm-dashboard:
-	@echo "Starting CRM Dashboard on http://localhost:3000..."
-	cd crm-dashboard && npm run dev
+	@echo "Starting CRM Dashboard on http://localhost:$(DASHBOARD_PORT)..."
+	cd crm-dashboard && PORT=$(DASHBOARD_PORT) npm run dev
 
 # Start both servers (API in background, dashboard in foreground)
-crm-dev:
+crm-dev: kill-ports
 	@echo "=== CRM Development Mode ==="
-	@echo "Starting API server in background..."
-	@./venv/bin/uvicorn api.server:app --reload --port 8001 & echo $$! > .api.pid
-	@echo "API running at http://localhost:8001"
+	@echo "API:       http://localhost:$(API_PORT)"
+	@echo "Dashboard: http://localhost:$(DASHBOARD_PORT)"
 	@echo ""
-	@echo "Starting dashboard..."
-	@cd crm-dashboard && npm run dev
+	@./venv/bin/uvicorn api.server:app --reload --port $(API_PORT) & echo $$! > .api.pid
+	@sleep 2
+	@cd crm-dashboard && PORT=$(DASHBOARD_PORT) npm run dev
 	@# Cleanup on exit
 	@kill $$(cat .api.pid) 2>/dev/null; rm -f .api.pid
 
