@@ -9,3 +9,7 @@ venv/
 # Google Auth
 credentials.json
 token.json
+
+
+# Local Folder
+local-files/
