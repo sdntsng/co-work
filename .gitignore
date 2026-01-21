@@ -13,4 +13,4 @@ token.json
 
 # Local Folder
 local-files/
-mcp_config.json
+.gemini/settings.json

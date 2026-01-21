@@ -13,7 +13,7 @@ The following files define the operational bounds and capabilities of this agent
 - **[.agent/rules/design_system.md](.agent/rules/design_system.md)**: "Digital Paper" UI standards (Typography, Colors, Spacing).
 
 ### 🛠 MCP Configuration & Tools
-- **[mcp_config.json](mcp_config.json)**: Main MCP server definitions (Perplexity, GitHub).
+- **[.gemini/settings.json](.gemini/settings.json)**: Workspace settings containing MCP server definitions (Perplexity).
 - **[docs/mcp/available_tools.md](docs/mcp/available_tools.md)**: Detailed documentation of available MCP capabilities.
 
 ### 🗺 Roadmap
