@@ -14,3 +14,6 @@ token.json
 # Local Folder
 local-files/
 .gemini/settings.json
+
+# MCP Servers (cloned third-party repos + venv)
+mcp-servers/
