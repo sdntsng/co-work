@@ -75,10 +75,20 @@ python3 memory-system/ingest.py
 
 ---
 
-## Directory Structure
+### 4. Context Switching (MCP Profiles)
+To manage noise and token usage, you can switch between active toolsets:
+
+```bash
+# Available profiles: full, coding, social
+python3 mcp-servers/scripts/switch_profile.py coding
 ```
-co-work/
-├── .gemini/                  # Agent brain & settings
+
+*   **coding**: GitHub, Perplexity, Memory (No WhatsApp/Granola/Google)
+*   **social**: WhatsApp, Granola, Google, Memory (No GitHub)
+*   **full**: All tools enabled
+
+**Note**: You must restart your client (Claude/Cursor) after switching.
+
 ├── mcp-servers/              # MCP Server Implementations
 │   ├── .venv/                # Shared Python Environment
 │   ├── whatsapp-mcp/         # WhatsApp Server (Docker)
