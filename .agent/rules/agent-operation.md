@@ -96,7 +96,7 @@ The agent can perform CRM actions directly via the terminal using `src.main`.
 ## 5. Development Rules
 - **Backend**: Python 3.13 (`venv`). Run via `make crm-api`.
 - **Frontend**: Next.js 16 (Turbopack). Run via `make crm-dashboard`.
-- **Commits**: Incremental, descriptive scope (e.g., `feat(ui): ...`, `fix(api): ...`).
+- **Commits**: **MANDATORY:** Commit changes incrementally for each distinct update or edit. Do NOT batch multiple logical changes into a single commit. Use descriptive scope (e.g., `feat(ui): ...`, `fix(api): ...`).
 - **Dependencies**:
     - Backend: `requirements.txt`
     - Frontend: `package.json` (Tailwind v4)
