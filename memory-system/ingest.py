@@ -98,6 +98,10 @@ def ingest_granola(index, model):
             notes = meeting.get('notes_plain') or meeting.get('notes_markdown')
             if notes:
                 text_parts.append(f"Notes: {str(notes)[:2000]}") # Truncate long notes
+
+            transcript = meeting.get('transcript')
+            if transcript:
+                text_parts.append(f"Transcript: {str(transcript)[:8000]}") # Limit transcript size
                 
             text = "\n".join(text_parts)
             
@@ -146,11 +150,120 @@ def main():
     # 1. Ingest Granola
     ingest_granola(pc_index, model)
     
-    # 2. Ingest WhatsApp (Placeholder)
-    # logger.info("WhatsApp ingestion not implemented yet.")
+import sqlite3
+from collections import defaultdict
+
+def ingest_whatsapp(index, model):
+    WHATSAPP_DB_PATH = os.path.join(os.path.dirname(__file__), "../mcp-servers/whatsapp-mcp/data/db/messages.db")
+    
+    if not os.path.exists(WHATSAPP_DB_PATH):
+        logger.warning(f"WhatsApp DB not found at {WHATSAPP_DB_PATH}")
+        return
+
+    logger.info(f"Reading WhatsApp DB from {WHATSAPP_DB_PATH}...")
+    
+    try:
+        conn = sqlite3.connect(WHATSAPP_DB_PATH)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        # Filter for messages in the last 30 days to respect "Archive" heuristic
+        thirty_days_ago = int(time.time()) - (30 * 24 * 60 * 60)
+        
+        query = """
+        SELECT 
+            chat_jid,
+            chat_name,
+            timestamp,
+            sender_push_name,
+            is_from_me,
+            text
+        FROM messages_with_names
+        WHERE timestamp > ? AND text IS NOT NULL AND text != ''
+        ORDER BY chat_jid, timestamp ASC
+        """
+        
+        cursor.execute(query, (thirty_days_ago,))
+        rows = cursor.fetchall()
+        conn.close()
+        
+        logger.info(f"Found {len(rows)} WhatsApp messages from last 30 days.")
+        
+        # Group by Chat -> Date
+        chats_by_date = defaultdict(list)
+        
+        for row in rows:
+            # Format date as YYYY-MM-DD
+            date_str = datetime.fromtimestamp(row['timestamp']).strftime('%Y-%m-%d')
+            key = (row['chat_jid'], row['chat_name'], date_str)
+            chats_by_date[key].append(row)
+            
+        vectors = []
+        batch_size = 50
+        
+        for (chat_jid, chat_name, date_str), messages in chats_by_date.items():
+            # Build conversation text
+            lines = [f"Chat: {chat_name}", f"Date: {date_str}", "-" * 20]
+            
+            for msg in messages:
+                sender = "Me" if msg['is_from_me'] else (msg['sender_push_name'] or "Unknown")
+                time_str = datetime.fromtimestamp(msg['timestamp']).strftime('%H:%M')
+                lines.append(f"[{time_str}] {sender}: {msg['text']}")
+                
+            full_text = "\n".join(lines)
+            
+            # Embed
+            embedding = model.encode(full_text).tolist()
+            
+            # Create ID
+            doc_id = f"wa_{chat_jid}_{date_str}"
+            
+            vectors.append({
+                "id": doc_id,
+                "values": embedding,
+                "metadata": {
+                    "source": "whatsapp",
+                    "type": "chat_history",
+                    "chat_id": chat_jid,
+                    "chat_name": chat_name,
+                    "date": date_str,
+                    "text": full_text[:4000]
+                }
+            })
+            
+            if len(vectors) >= batch_size:
+                logger.info(f"Upserting {len(vectors)} WhatsApp conversation days...")
+                index.upsert(vectors=vectors, namespace="whatsapp")
+                vectors = []
+                
+        if vectors:
+            logger.info(f"Upserting final {len(vectors)} WhatsApp conversation days...")
+            index.upsert(vectors=vectors, namespace="whatsapp")
+            
+        logger.info("WhatsApp ingestion complete.")
+
+    except Exception as e:
+        logger.error(f"Error ingesting WhatsApp: {e}")
+
+def main():
+    logger.info("Starting memory ingestion...")
+    
+    pc_index = setup_pinecone()
+    if not pc_index:
+        logger.error("Failed to setup Pinecone. Exiting.")
+        return
+
+    model = get_embedding_model()
+    
+    # 1. Ingest Granola
+    ingest_granola(pc_index, model)
+    
+    # 2. Ingest WhatsApp
+    ingest_whatsapp(pc_index, model)
     
     # 3. Ingest Gmail/Cal (Placeholder)
     # logger.info("Gmail/Calendar ingestion not implemented yet.")
+
     
     logger.info("Ingestion run finished.")
 
