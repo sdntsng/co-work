@@ -10,11 +10,12 @@ Enable the AI Agent to perform Google Workspace operations and maintain the appl
 
 ## 1. MCP Registry
 
-| Operation | Source |
-|-----------|---------|
-| Web Search | `perplexity-ask` (MCP) |
-| GitHub | `github-mcp-server` (MCP) |
-| Workspace | `google-workspace` (Extension) |
+| Operation | Source | Type |
+|-----------|---------|------|
+| Web Search | `perplexity-ask` | Local MCP Config |
+| GitHub | `github` | Extension |
+| Pinecone | `pinecone-mcp` | Extension |
+| Workspace | `google-workspace` | Extension |
 
 ---
 

@@ -12,18 +12,26 @@ Requires `PERPLEXITY_API_KEY`.
 
 ---
 
-# GitHub MCP
+# GitHub (Gemini Extension)
 
-**Server:** `github-mcp-server`
-**Source:** `@modelcontextprotocol/server-github` (npm)
+**Extension:** `github`
+**Source:** `https://github.com/github/github-mcp-server`
 
 ## Capabilities
+- **Remote MCP**: Connects to `https://api.githubcopilot.com/mcp/`.
 - **Repository Management**: Read file contents, list files.
-- **Issues**: Create, read, update issues.
-- **Pull Requests**: Review and manage PRs.
+- **Issues & PRs**: Create, read, and manage issues/pull requests.
 
-## Configuration
-Requires `GITHUB_PERSONAL_ACCESS_TOKEN`.
+---
+
+# Pinecone (Gemini Extension)
+
+**Extension:** `pinecone-mcp`
+**Source:** `https://github.com/pinecone-io/pinecone-mcp`
+
+## Capabilities
+- **Vector Database**: Manage indexes and query vector data.
+- **MCP Server**: Runs `@pinecone-database/mcp`.
 
 ---
 
