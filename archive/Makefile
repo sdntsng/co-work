@@ -1,12 +1,8 @@
 
-.PHONY: setup login run lint crm-init crm-api crm-dashboard crm-dev kill-ports
+.PHONY: setup login run lint kill-ports
 
 PYTHON = ./venv/bin/python
 MODULE = src.main
-
-# Unique ports for CRM (using 2026 suffix to avoid conflicts)
-API_PORT = 8026
-DASHBOARD_PORT = 3026
 
 # =============================================================================
 # Setup & Auth

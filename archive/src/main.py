@@ -1,11 +1,11 @@
 import typer
 from rich.console import Console
 
-from .auth import authenticate
-from .sheets import SheetManager
-from .drive import DriveManager
-from .docs import DocsManager
-from .workflows import WorkflowManager
+from src.services.google.auth import authenticate
+from src.services.google.sheets import SheetManager
+from src.services.google.drive import DriveManager
+from src.services.google.docs import DocsManager
+from src.core.workflows import WorkflowManager
 
 app = typer.Typer()
 console = Console()
@@ -123,12 +123,6 @@ def append_row(sheet: str, values: str = typer.Argument(..., help="Comma separat
         manager.append_row(sheet, data)
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
-
-
-# =============================================================================
-# CRM Commands Removed
-# (This codebase has been reverted to basic agent tools. See sheety-crm for CRM)
-# =============================================================================
 
 
 if __name__ == "__main__":

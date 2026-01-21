@@ -1,5 +1,5 @@
-from .sheets import SheetManager
-from .drive import DriveManager
+from src.services.google.sheets import SheetManager
+from src.services.google.drive import DriveManager
 from rich.console import Console
 
 console = Console()
