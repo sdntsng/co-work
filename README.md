@@ -79,13 +79,15 @@ python3 memory-system/ingest.py
 To manage noise and token usage, you can switch between active toolsets:
 
 ```bash
-# Available profiles: full, coding, social
-python3 mcp-servers/scripts/switch_profile.py coding
+# Available profiles: full, coding, work-vinci, work-engram, personal
+python3 mcp-servers/scripts/switch_profile.py work-vinci
 ```
 
-*   **coding**: GitHub, Perplexity, Memory (No WhatsApp/Granola/Google)
-*   **social**: WhatsApp, Granola, Google, Memory (No GitHub)
-*   **full**: All tools enabled
+*   **work-vinci**: s@tryvinci.com tools + Granola + WhatsApp + Perplexity.
+*   **work-engram**: siddhant@engramhq.com tools + Granola + GitHub + Perplexity.
+*   **personal**: Personal Gmail + WhatsApp.
+*   **coding**: GitHub + Perplexity + Context7 (Pure Dev).
+*   **full**: All tools enabled.
 
 **Note**: You must restart your client (Claude/Cursor) after switching.
 

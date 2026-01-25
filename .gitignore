@@ -17,3 +17,6 @@ local-files/
 
 # MCP Servers (cloned third-party repos + venv)
 mcp-servers/
+
+# AI tool configs secrets
+ai-tool-configs/secrets/
