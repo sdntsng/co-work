@@ -1,0 +1,57 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": [
+    "opencode-antigravity-auth@latest",
+    "opencode-antigravity-quota@latest"
+  ],
+  "mcp": {
+    "perplexity-ask": {
+      "type": "local",
+      "command": ["/opt/homebrew/bin/npx", "-y", "server-perplexity-ask"],
+      "environment": {
+        "PERPLEXITY_API_KEY": "{env:PERPLEXITY_API_KEY}",
+        "PATH": "/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+      },
+      "enabled": true
+    },
+    "github-mcp-server": {
+      "type": "local",
+      "command": ["/opt/homebrew/bin/npx", "-y", "@modelcontextprotocol/server-github"],
+      "environment": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "{env:GITHUB_PERSONAL_ACCESS_TOKEN}",
+        "PATH": "/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+      },
+      "enabled": true
+    },
+    "context7": {
+      "type": "local",
+      "command": ["/opt/homebrew/bin/npx", "-y", "@upstash/context7-mcp", "--api-key", "{env:CONTEXT7_API_KEY}"],
+      "environment": {
+        "PATH": "/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+      },
+      "enabled": true
+    },
+    "granola-mcp": {
+      "type": "local",
+      "command": ["/Users/sid/Documents/Projects/co-work/mcp-servers/.venv/bin/python", "-m", "granola_mcp.mcp"],
+      "environment": {
+        "GRANOLA_CACHE_PATH": "/Users/sid/Library/Application Support/Granola/cache-v3.json",
+        "PATH": "/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+      },
+      "enabled": true
+    },
+    "whatsapp": {
+      "type": "remote",
+      "url": "{env:WHATSAPP_MCP_URL}",
+      "enabled": true
+    },
+    "pinecone-mcp-server": {
+      "type": "local",
+      "command": ["npx", "-y", "@pinecone-database/mcp"],
+      "environment": {
+        "PINECONE_API_KEY": "{env:PINECONE_API_KEY}"
+      },
+      "enabled": true
+    }
+  }
+}
