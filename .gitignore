@@ -16,7 +16,11 @@ local-files/
 .gemini/settings.json
 
 # MCP Servers (cloned third-party repos + venv)
-mcp-servers/
+mcp-servers/*
+!mcp-servers/scripts/
+
+# Logs
+*.log
 
 # AI tool configs secrets
 ai-tool-configs/secrets/
